@@ -3,6 +3,8 @@ package com.vrushank.crickstars.data.repository
 import com.vrushank.crickstars.data.room.Player
 import com.vrushank.crickstars.data.room.Team
 import com.vrushank.crickstars.data.room.TeamDao
+import com.vrushank.crickstars.data.room.TeamWithPlayers
+import kotlinx.coroutines.flow.Flow
 
 class TeamRepository(val dao:TeamDao) {
     suspend fun insertTeam(name:String):Int{
@@ -14,4 +16,11 @@ class TeamRepository(val dao:TeamDao) {
     }
     suspend fun getTeams():List<Team> = dao.getTeams()
     suspend fun getPlayersForTeam(teamId: Int):List<Player> = dao.getPlayersForTeam(teamId)
+
+    val teamsWithPlayers :Flow<List<TeamWithPlayers>> = dao.getTeamsWithPlayers()
+
+    suspend fun deleteAllData() {
+        dao.deleteAllPlayers()
+        dao.deleteAllTeams()
+    }
 }

@@ -7,17 +7,23 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vrushank.crickstars.data.repository.TeamRepository
+import com.vrushank.crickstars.data.room.TeamWithPlayers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MainViewModel(val repo:TeamRepository):ViewModel() {
     var teamName by mutableStateOf("")
     var playerName by mutableStateOf("")
     var lastTeamId by mutableStateOf<Int?>(null)
+    val teams : StateFlow<List<TeamWithPlayers>> = repo.teamsWithPlayers
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
     fun saveTeam(){
         viewModelScope.launch {
             val id = repo.insertTeam(teamName)
             lastTeamId = id
-            teamName = ""
+
         }
     }
     fun savePlayer(){
@@ -26,6 +32,11 @@ class MainViewModel(val repo:TeamRepository):ViewModel() {
                 repo.insertPlayer(playerName,it)
                 playerName = ""
             }
+        }
+    }
+    fun deleteAllData() {
+        viewModelScope.launch {
+            repo.deleteAllData()
         }
     }
 }

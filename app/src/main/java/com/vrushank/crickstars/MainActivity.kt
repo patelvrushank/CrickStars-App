@@ -32,10 +32,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val dao = PlayerDataBase.getInstance(this).teamDao()
-        val vm:MainViewModel by viewModels {
-            object : ViewModelProvider.Factory{
+        val vm: MainViewModel by viewModels {
+            object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    if (modelClass.isAssignableFrom(MainViewModel::class.java)){
+                    if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
 
                         val repo = TeamRepository(dao)
                         @Suppress("UNCHECKED_CAST")
@@ -53,25 +53,36 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
 
-                NavHost(navController,Screens.Home.route){
-                    composable(Screens.Home.route){
-                        HomeScreen(){
-                           navController.navigate(it)
+                NavHost(navController, Screens.Home.route) {
+                    composable(Screens.Home.route) {
+                        HomeScreen() {
+                            navController.navigate(it)
                         }
                     }
-                    composable(Screens.NewMatch.route){
-                        StartNewMatch({navController.navigate(it)},{navController.navigate(it)})
+                    composable(Screens.NewMatch.route) {
+
+                        StartNewMatch({ navController.navigate(it) },
+                            { navController.navigate(it) })
                     }
-                    composable(Screens.SelectTeamPlayers.route){
-                        SelectTeamPlayers({return@SelectTeamPlayers vm.teamName},{
-                            vm.teamName = it
-                        },{ vm.saveTeam()})
+                    composable(Screens.SelectTeamPlayers.route) {
+                        var list = vm.teams
+                        SelectTeamPlayers(
+                            { return@SelectTeamPlayers vm.teamName },
+                            {
+                                vm.teamName = it
+                            },
+                            { vm.saveTeam() },
+                            list,
+                            { vm.deleteAllData() },
+                            { return@SelectTeamPlayers vm.playerName },
+                            { vm.playerName = it },
+                            { vm.savePlayer() })
                     }
                 }
 
-                }
             }
         }
     }
+}
 
 
